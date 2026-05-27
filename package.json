@@ -1,0 +1,42 @@
+{
+  "name": "codex-alert",
+  "version": "0.1.1",
+  "description": "Cross-platform sound + toast notifications for OpenAI Codex CLI hooks",
+  "type": "module",
+  "bin": {
+    "cda": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "scripts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "openai",
+    "codex",
+    "codex-cli",
+    "notification",
+    "toast",
+    "hook",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "picocolors": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "license": "MIT"
+}
