@@ -17,6 +17,7 @@
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit"
   },
+  "homepage": "https://www.npmjs.com/package/codex-alert",
   "keywords": [
     "openai",
     "codex",
