@@ -50,6 +50,7 @@ export async function runInit(): Promise<void> {
   // 4) merge plan 미리 산출 → diff
   const { next, plan } = mergeHooks(hooks, enabled, matchers, decision);
   p.log.message(renderMergeDiff(plan));
+  p.log.message(pc.green('  + ~/.codex/skills/cda-off, cda-on  (mute/unmute skills)'));
 
   // 'skip' 으로 결정된 이벤트는 hooks.json 에 안 들어가므로
   // cda-config 에서도 비활성 처리 + advanced prompt 에서 제외
@@ -80,6 +81,12 @@ export async function runInit(): Promise<void> {
   const pkgScriptsDir = locatePackageScripts();
   await copyFile(join(pkgScriptsDir, 'cda.ps1'), paths.scriptPs1);
   await copyFile(join(pkgScriptsDir, 'cda.sh'), paths.scriptSh);
+
+  // 8.5) 토글 스킬 설치
+  await mkdir(paths.skillOffDir, { recursive: true });
+  await mkdir(paths.skillOnDir, { recursive: true });
+  await copyFile(join(pkgScriptsDir, 'skills', 'cda-off', 'SKILL.md'), join(paths.skillOffDir, 'SKILL.md'));
+  await copyFile(join(pkgScriptsDir, 'skills', 'cda-on', 'SKILL.md'), join(paths.skillOnDir, 'SKILL.md'));
 
   // 9) cda-config.json 쓰기
   await writeCdaConfig(cfg);

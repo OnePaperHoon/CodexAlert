@@ -27,6 +27,7 @@ npx codex-alert init
 4. 원하면 이벤트별로 사운드와 메시지를 따로 설정할 수 있습니다.
 5. 변경 내용(diff)을 미리 보여주고, 확인을 받은 뒤에만 적용합니다.
 6. `hooks.json`을 `~/.codex/cda-backups/`에 자동 백업합니다 (최근 3개 유지).
+7. Codex 스킬 `cda-off`, `cda-on`을 `~/.codex/skills/`에 설치합니다.
 
 ## ⚠ `/hooks` Trust 단계 (반드시!)
 
@@ -47,6 +48,18 @@ Codex CLI는 non-managed hook을 등록한 직후에는 **trust 처리 전까지
 | `cda disable`   | 알림 음소거 (`~/.codex/notifications.disabled` 생성) |
 | `cda enable`    | 음소거 해제 |
 | `cda uninstall` | 우리 hook만 제거 (사용자가 직접 등록한 hook은 손대지 않음) |
+
+## Codex 안에서 토글
+
+`cda init`은 Codex 스킬도 함께 설치합니다 (`~/.codex/skills/cda-off`, `cda-on`). Codex 세션 안에서 말로 음소거할 수 있습니다.
+
+- "코덱스 알림 꺼줘 / 음소거" → `cda-off` 스킬이 `~/.codex/notifications.disabled`를 생성
+- "코덱스 알림 켜줘 / 해제" → `cda-on` 스킬이 삭제
+
+`cda disable`/`enable`(CLI)과 **동일한 플래그**를 토글하므로 상태가 항상 일치합니다. `cda uninstall`에서 함께 제거할 수 있습니다.
+
+> - 신규 스킬은 codex를 **재시작**해야 인식될 수 있습니다.
+> - 스킬이 워크스페이스 밖(`~/.codex`)에 파일을 쓰므로, 샌드박스 설정에 따라 **쓰기 승인**이 필요할 수 있습니다.
 
 ## 이벤트 라인업
 
@@ -113,7 +126,7 @@ Codex는 `~/.codex/hooks.json`과 `~/.codex/config.toml`의 `[[hooks.X]]`를 **�
 cda uninstall
 ```
 
-`command`가 우리 dispatcher를 가리키는 hook만 골라서 제거합니다. 다른 hook은 그대로 남습니다. dispatcher 스크립트, 설정 파일, 사용자가 등록한 사운드 파일도 함께 지울지 선택할 수 있습니다.
+`command`가 우리 dispatcher를 가리키는 hook만 골라서 제거합니다. 다른 hook은 그대로 남습니다. dispatcher 스크립트, 설정 파일, 토글 스킬(`cda-off`, `cda-on`), 사용자가 등록한 사운드 파일도 함께 지울지 선택할 수 있습니다.
 
 ## 플랫폼 요구사항
 
@@ -128,6 +141,8 @@ cda uninstall
 |------|------|
 | 알림이 안 뜸 | `codex` 안에서 `/hooks`를 실행하고 cda hook을 trust 했나요? |
 | 알림이 안 뜸 | `~/.codex/notifications.disabled`가 있나요? `cda enable` 실행. |
+| `cda-off`/`cda-on` 스킬이 안 보임 | codex를 재시작해 스킬을 다시 인덱싱하세요. |
+| 스킬이 플래그 파일을 못 씀 | 워크스페이스 밖 쓰기라 샌드박스 승인이 필요할 수 있습니다. 승인하거나 `cda disable`/`enable`(CLI)을 사용하세요. |
 | 알림이 두 번 뜸 | 같은 이벤트에 다른 hook이 있는 상태에서 "append"를 선택했거나, `config.toml`에도 같은 이벤트 hook이 있는 경우입니다. |
 | 토스트는 뜨는데 사운드가 안 남 | `cda-config.json`의 사운드 경로가 실제로 존재하나요? Windows에서는 `.wav`만 재생됩니다. |
 | `hooks.json`이 깨졌어요 | `~/.codex/cda-backups/hooks.YYYYMMDD-HHmm.json`에서 복구하세요. |
@@ -135,7 +150,15 @@ cda uninstall
 
 ## 참고: ClaudeCodeAlert
 
-이 라이브러리는 [Claude Code](https://claude.com/claude-code)용 [`claude-code-alert`](https://www.npmjs.com/package/claude-code-alert) 아키텍처 패턴을 참고했지만, 독립된 별개 라이브러리입니다. 음소거 플래그도 분리되어 있어 한 시스템에 둘 다 설치해서 함께 사용할 수 있습니다.
+이 라이브러리는 [Claude Code](https://claude.com/claude-code)용 자매 라이브러리 [`claude-code-alert`](https://www.npmjs.com/package/claude-code-alert) (`cca`)의 아키텍처 패턴을 참고했지만, 독립된 별개 라이브러리입니다. Claude Code 안에서는 `/cca-off`·`/cca-on` 슬래시 커맨드로 토글합니다. 음소거 플래그가 `~/.codex`와 `~/.claude`로 분리되어 있어 한 시스템에 둘 다 설치해서 서로 독립적으로 사용할 수 있습니다.
+
+## 변경 이력
+
+### 1.0.0
+- 정식 1.0 릴리스.
+- Codex 스킬 `cda-off`, `cda-on` 추가 — Codex 세션 안에서 말로 알림 음소거 토글. `cda init`이 설치하고 `cda uninstall`에서 제거.
+- `cda status`에 토글 스킬 설치 여부 표시.
+- `cda disable`/`enable`(CLI)과 동일한 음소거 플래그를 공유 → 상태 정합 보장.
 
 ## 라이선스
 

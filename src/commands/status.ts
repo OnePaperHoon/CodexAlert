@@ -84,6 +84,8 @@ export async function runStatus(): Promise<void> {
 
   console.log();
   console.log(`  Mute flag:  ${disabled ? pc.yellow('on (notifications muted)') : pc.dim('off')}`);
+  const skillsInstalled = existsSync(paths.skillOffDir) || existsSync(paths.skillOnDir);
+  console.log(`  Toggle skills: ${skillsInstalled ? pc.green('cda-off, cda-on') : pc.dim('—')}`);
 
   if (existsSync(paths.backupsDir)) {
     const files = readdirSync(paths.backupsDir)

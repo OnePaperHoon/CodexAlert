@@ -22,9 +22,10 @@ export async function runUninstall(): Promise<void> {
     options: [
       { value: 'scripts', label: '~/.codex/scripts/cda.{ps1,sh}', hint: 'recommended' },
       { value: 'config',  label: '~/.codex/cda-config.json',     hint: 'recommended' },
+      { value: 'skills',  label: '~/.codex/skills/cda-off, cda-on', hint: 'recommended' },
       { value: 'sounds',  label: '~/.codex/sounds/  (custom sounds)' },
     ],
-    initialValues: ['scripts', 'config'],
+    initialValues: ['scripts', 'config', 'skills'],
     required: false,
   });
   if (p.isCancel(alsoDelete)) {
@@ -51,6 +52,11 @@ export async function runUninstall(): Promise<void> {
   }
   if (targets.includes('config') && existsSync(paths.cdaConfig)) {
     await unlink(paths.cdaConfig);
+  }
+  if (targets.includes('skills')) {
+    for (const d of [paths.skillOffDir, paths.skillOnDir]) {
+      if (existsSync(d)) await rm(d, { recursive: true, force: true });
+    }
   }
   if (targets.includes('sounds') && existsSync(paths.soundsDir)) {
     await rm(paths.soundsDir, { recursive: true, force: true });
